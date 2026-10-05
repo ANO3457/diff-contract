@@ -41,6 +41,7 @@ htmlcov/
 .nox/
 .coverage
 .coverage.*
+temp_auto_push.bat
 .cache
 nosetests.xml
 coverage.xml
@@ -73,7 +74,6 @@ venv.bak/
 
 # IDE
 .idea/
-.vscode/
 *.swp
 *.swo
 *~
@@ -85,3 +85,5 @@ Thumbs.db
 
 # MkDocs build output
 site/
+.gitignore
+branch_structure.json
