@@ -148,6 +148,45 @@ SARIF output includes one rule per violation type. Block violations emit at `err
 
 ## Aggregate Limits
 
+### Glob patterns and editor validation
+
+Patterns use Python's `fnmatch` against the whole path, not gitignore syntax.
+Both `*` and `**` can match `/`; `**` is not a separate recursive-directory
+operator. `?` matches one character and `[!...]` negates a character class.
+A leading `!` outside brackets is a literal character, not a deny exception.
+To exclude a path from an allowed scope, put it in `deny` (deny takes priority).
+Case matching follows the operating system's `fnmatch` normalization.
+
+| Pattern | Example match | Common use |
+|---------|---------------|------------|
+| `src/**` | `src/app.py`, `src/pkg/app.py` | Source subtree |
+| `*.py` | `app.py`, `src/app.py` | Python files at any depth |
+| `tests/test_?.py` | `tests/test_a.py`, not `tests/test_ab.py` | Single-character suffix |
+| `docs/[ab]*.md` | `docs/api.md`, `docs/build.md` | Character alternatives |
+| `docs/[!_]*.md` | `docs/guide.md`, not `docs/_draft.md` | Exclude an initial character |
+| `!important.txt` | `!important.txt`, not `important.txt` | Literal exclamation mark |
+
+Quote glob strings in YAML, especially patterns starting with `*`, `!`, or `[`.
+Denied-path diagnostics name the matched deny pattern; out-of-scope diagnostics
+list the allowed patterns that did not match.
+
+[`schema.json`](schema.json) describes all version 1 rule fields, including
+aggregate limits, optional names, and `block`/`warn`/`info` severities. It can
+validate a YAML document after parsing it to JSON-compatible values. For VS Code
+with the YAML extension, add this directive at the top of `.diffcontract.yml`:
+
+```yaml
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yunaremaia/diff-contract/main/schema.json
+version: 1
+rules:
+  - name: Source only
+    allow: ["src/**"]
+```
+
+The schema is an editor/validation aid; the runtime parser is unchanged. Schema
+validation catches unknown keys and negative size limits but does not apply
+defaults or replace a real `diff-contract check`.
+
 Path allow/deny rules constrain *which* files may change. `max_files` and `max_lines` constrain *how large* a change set may be. They are evaluated against the whole diff after per-file rules run.
 
 | Field | Meaning |

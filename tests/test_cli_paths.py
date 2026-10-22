@@ -434,7 +434,10 @@ class TestCheckJsonOutput:
                 "file": "src/core/main.py",
                 "severity": "block",
                 "rule": "Deny core",
-                "message": "File 'src/core/main.py' is denied by rule 'Deny core'",
+                "message": (
+                    "File 'src/core/main.py' is denied by rule 'Deny core' "
+                    "(matched deny pattern 'src/core/**')"
+                ),
             }
         ]
 
