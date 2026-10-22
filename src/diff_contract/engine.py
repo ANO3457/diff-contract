@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import fnmatch
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -100,11 +101,15 @@ class RulesEngine:
         """Check a single file against a single rule."""
         # Deny takes priority — if file matches deny, it's a violation
         if rule.matches_deny(file):
+            pattern = next(p for p in rule.deny if fnmatch.fnmatch(file, p))
             return Violation(
                 file=file,
                 severity=rule.on_violation,
                 rule=rule.name,
-                message=f"File '{file}' is denied by rule '{rule.name}'",
+                message=(
+                    f"File '{file}' is denied by rule '{rule.name}' "
+                    f"(matched deny pattern {pattern!r})"
+                ),
             )
 
         # If allow patterns are defined and file doesn't match, it's a violation
@@ -113,7 +118,10 @@ class RulesEngine:
                 file=file,
                 severity=rule.on_violation,
                 rule=rule.name,
-                message=f"File '{file}' not allowed by rule '{rule.name}'",
+                message=(
+                    f"File '{file}' not allowed by rule '{rule.name}' "
+                    f"(allow patterns: {', '.join(repr(p) for p in rule.allow)})"
+                ),
             )
 
         return None

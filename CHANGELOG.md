@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Added
+
+- Version 1 contract JSON Schema and documented `fnmatch` glob examples (#27).
+- Path-violation messages include the matched deny pattern or the allowed scope patterns.
+
 ## [0.1.6] - 2026-10-05
 
 ### Added
